@@ -3,283 +3,316 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>リンクメモ</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="リンク帳">
+<meta name="theme-color" content="#F3F5F8">
+<title>じぶんリンク帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Inter:wght@500;600&display=swap">
 <style>
+/* Layout: 1カラムのボタン棚。上に検索＋カテゴリタブ（sticky）、右下に追加ボタン、編集はボトムシート */
 :root{
-  --bg:#f4f4f6;--card:#fff;--text:#1b1b1f;--sub:#6b6b75;--line:#e2e2e8;
-  --accent:#ff5a5f;--accent-text:#fff;--chip:#ffecec;--chip-text:#c2363b;
+  --bg:#F3F5F8; --surface:#FFFFFF; --ink:#18202E; --muted:#667085; --line:#DDE2EA;
+  --accent:#2B59C3; --accent-ink:#FFFFFF; --danger:#C2362B; --chip:#E6EBF3;
+  --c1:#2B59C3; --c2:#1F8A70; --c3:#D9822B; --c4:#C2362B; --c5:#7B4BB7; --c6:#4A5568;
+  --font:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --num:"Inter",system-ui,sans-serif;
+  --r:14px;
 }
-@media (prefers-color-scheme:dark){
-  :root{--bg:#121214;--card:#1e1e22;--text:#f2f2f5;--sub:#9a9aa5;--line:#2e2e34;
-    --chip:#3a2224;--chip-text:#ff9a9d;}
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;
-  padding:0 16px calc(40px + env(safe-area-inset-bottom));}
-header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;
-  justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 0 10px;}
-h1{font-size:20px;margin:0}
-button{font:inherit;border:none;border-radius:10px;cursor:pointer}
-.primary{background:var(--accent);color:var(--accent-text);padding:9px 16px;font-weight:700}
-.ghost{background:transparent;color:var(--sub);padding:6px 10px;border:1px solid var(--line)}
-textarea,input{font:inherit;font-size:16px;color:var(--text);background:var(--card);
-  border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
-#freeMemo{min-height:64px;resize:vertical}
-.free-label{font-size:12px;color:var(--sub);margin:4px 0 4px 2px}
-#list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-.empty{color:var(--sub);text-align:center;padding:40px 0;font-size:14px}
-.card{background:var(--card);border-radius:14px;padding:12px;border:1px solid var(--line)}
-.main{display:block;background:var(--accent);color:var(--accent-text);text-decoration:none;
-  font-weight:700;font-size:17px;padding:14px;border-radius:10px;text-align:center;word-break:break-all}
-.memo{font-size:14px;color:var(--sub);margin-top:8px;white-space:pre-wrap;word-break:break-word}
-.times{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{background:var(--chip);color:var(--chip-text);text-decoration:none;border-radius:999px;
-  padding:7px 12px;font-size:14px;font-weight:700}
-.chip small{font-weight:400;margin-left:4px}
-.ops{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
-.ops button{background:transparent;color:var(--sub);padding:4px 10px;font-size:13px;border:1px solid var(--line)}
-details{margin-top:28px;background:var(--card);border-radius:14px;border:1px solid var(--line);padding:12px}
-summary{font-weight:700;cursor:pointer}
-details h3{font-size:15px;margin:16px 0 6px}
-details ol{padding-left:20px;font-size:14px;line-height:1.7;margin:0}
-details p{font-size:14px;line-height:1.6;margin:6px 0}
-code.bm{display:block;font-size:11px;word-break:break-all;background:var(--bg);padding:8px;border-radius:8px;
-  max-height:80px;overflow:auto;margin:6px 0}
-.row{display:flex;gap:8px;margin-top:8px}
-dialog{border:none;border-radius:16px;padding:0;width:min(520px,calc(100vw - 24px));
-  background:var(--card);color:var(--text)}
-dialog::backdrop{background:rgba(0,0,0,.45)}
-.dlg{padding:16px;display:flex;flex-direction:column;gap:10px;max-height:85vh;overflow:auto}
-.dlg label{font-size:12px;color:var(--sub);margin-bottom:-6px}
-.trow{display:flex;gap:6px;align-items:center}
-.trow input.t{width:90px;flex:none}
-.trow button{flex:none;background:transparent;color:var(--sub);font-size:18px;padding:4px 8px}
-.dlg-foot{display:flex;gap:8px;justify-content:space-between;margin-top:6px}
-.danger{background:transparent;color:#e5484d;padding:9px 10px}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);
-  background:#333;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;
-  transition:opacity .2s;pointer-events:none}
-.toast.on{opacity:1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10141C; --surface:#1A202B; --ink:#E8ECF3; --muted:#98A2B3; --line:#2A3242;
+  --accent:#6E95F0; --accent-ink:#0E1420; --danger:#F07167; --chip:#232B39;
+  --c1:#6E95F0; --c2:#45C29E; --c3:#F0A65A; --c4:#F07167; --c5:#B08CE8; --c6:#A0AEC0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10141C; --surface:#1A202B; --ink:#E8ECF3; --muted:#98A2B3; --line:#2A3242;
+  --accent:#6E95F0; --accent-ink:#0E1420; --danger:#F07167; --chip:#232B39;
+  --c1:#6E95F0; --c2:#45C29E; --c3:#F0A65A; --c4:#F07167; --c5:#B08CE8; --c6:#A0AEC0;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 8px;display:grid;gap:10px}
+.top{display:flex;align-items:center;gap:8px}
+h1{font-size:19px;margin:0;font-weight:700;flex:1;letter-spacing:.02em}
+.icon-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;height:36px;padding:0 14px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.icon-btn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.search{width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 14px;font:inherit;font-size:16px}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-4px;padding-inline:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:0;background:var(--chip);color:var(--ink);border-radius:999px;height:32px;padding:0 14px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.tab .n{font-family:var(--num);font-size:11px;opacity:.7;margin-left:4px;font-variant-numeric:tabular-nums}
+.status{font-size:12px;color:var(--muted);min-height:18px}
+.list{display:grid;gap:10px;margin-top:6px}
+.group-h{font-size:12px;color:var(--muted);letter-spacing:.08em;margin:14px 2px 0;font-weight:500}
+.item{display:grid;gap:4px}
+.btn{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 12px 10px 10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);color:var(--ink);text-decoration:none;font:inherit;text-align:left;width:100%;cursor:pointer}
+.btn:active{transform:scale(.985)}
+.btn:focus-visible,.tab:focus-visible,.icon-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dot{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:16px}
+.t{flex:1;min-width:0}
+.t b{display:block;font-size:16px;font-weight:700;overflow-wrap:anywhere}
+.t small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--num)}
+.side{display:flex;gap:4px;flex:none}
+.mini{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;min-width:38px;height:38px;font:inherit;font-size:13px;cursor:pointer}
+.memo{font-size:13px;color:var(--muted);padding:0 6px 0 60px;white-space:pre-wrap;overflow-wrap:anywhere}
+.empty{text-align:center;color:var(--muted);padding:48px 12px;display:grid;gap:8px}
+.empty b{color:var(--ink);font-size:16px}
+.fab{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));height:56px;padding:0 22px;border-radius:999px;border:0;background:var(--accent);color:var(--accent-ink);font:inherit;font-size:16px;font-weight:700;box-shadow:0 6px 18px rgba(20,40,90,.25);cursor:pointer;z-index:6}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:13px;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,14,22,.45);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--surface);border-radius:18px 18px 0 0;max-height:90%;overflow:auto;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px));padding-block:18px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet-in{max-width:600px;margin:0 auto;display:grid;gap:14px}
+.sheet h2{margin:0;font-size:17px}
+label{display:grid;gap:6px;font-size:13px;font-weight:500;color:var(--muted)}
+input[type=text],input[type=url],textarea,select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit;font-size:16px}
+textarea{min-height:72px;resize:vertical}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.sw{width:34px;height:34px;border-radius:10px;border:3px solid transparent;cursor:pointer}
+.sw[aria-pressed="true"]{border-color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
+.primary{height:46px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.ghost{height:46px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
+.danger{color:var(--danger);border-color:var(--danger)}
+.danger.armed{background:var(--danger);color:#fff}
+.note{font-size:12px;color:var(--muted);margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>リンクメモ</h1>
-  <button class="primary" id="addBtn">＋追加</button>
-</header>
 
-<div class="free-label">メモ</div>
-<textarea id="freeMemo" placeholder="自由にメモ（自動保存）"></textarea>
-
-<main id="list"></main>
-
-<details id="settings">
-  <summary>⚙ 時間ジャンプの設定・バックアップ</summary>
-
-  <h3>① 時間ジャンプを登録（最初に1回だけ）</h3>
-  <ol>
-    <li>下の「コードをコピー」を押す</li>
-    <li>Safari下の共有ボタン →「ブックマークを追加」→ 名前を <b>ジャンプ</b> にして保存</li>
-    <li>ブックマーク一覧（本のアイコン）→ 右下「編集」→「ジャンプ」をタップ</li>
-    <li>アドレス欄を全部消して、コピーしたコードを貼り付け → 完了</li>
-  </ol>
-  <code class="bm" id="bmCode"></code>
-  <button class="primary" id="copyBm">コードをコピー</button>
-
-  <h3>② 使い方</h3>
-  <ol>
-    <li>このページで時間ボタン（例: 1:30）をタップ</li>
-    <li>開いたページで動画の再生ボタンを押す</li>
-    <li>アドレス欄をタップして「<b>ジャンプ</b>」と入力 → 候補に出たブックマークをタップ</li>
-  </ol>
-  <p>→ その時間に飛びます。時間ボタン以外から開いたときは、何秒に飛ぶか聞かれます。</p>
-
-  <h3>バックアップ</h3>
-  <p>データはこのiPhoneのSafariにだけ保存されています。たまに書き出してメモアプリ等に保存しておくと安心です。</p>
-  <div class="row">
-    <button class="ghost" id="exportBtn">書き出し（コピー）</button>
-    <button class="ghost" id="importBtn">読み込み</button>
-  </div>
-  <textarea id="ioArea" rows="4" placeholder="読み込むときはここに貼り付けてから「読み込み」" style="margin-top:8px"></textarea>
-</details>
-
-<dialog id="dlg">
-  <form class="dlg" method="dialog" id="form">
-    <label>ボタン名</label>
-    <input id="fTitle" placeholder="例：お気に入り①">
-    <label>リンク（URL）</label>
-    <input id="fUrl" type="url" inputmode="url" placeholder="https://...">
-    <label>ボタンのメモ</label>
-    <textarea id="fMemo" rows="3" placeholder="メモ（任意）"></textarea>
-    <label>時間ボタン（例: 1:30 / 90 / 1:02:03）</label>
-    <div id="fTimes"></div>
-    <button type="button" class="ghost" id="addTime">＋時間を追加</button>
-    <div class="dlg-foot">
-      <button type="button" class="danger" id="delBtn">削除</button>
-      <div style="display:flex;gap:8px">
-        <button type="button" class="ghost" id="cancelBtn">キャンセル</button>
-        <button type="button" class="primary" id="saveBtn">保存</button>
-      </div>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <h1>じぶんリンク帳</h1>
+      <button class="icon-btn" id="editToggle" aria-pressed="false">編集</button>
+      <button class="icon-btn" id="moreBtn" aria-label="バックアップ">⋯</button>
     </div>
-  </form>
-</dialog>
-
+    <input class="search" id="q" type="search" placeholder="名前・メモ・URLで探す" autocomplete="off">
+    <nav class="tabs" id="tabs"></nav>
+    <div class="status" id="status"></div>
+  </header>
+  <main class="list" id="list"></main>
+</div>
+<button class="fab" id="addBtn">＋ 追加</button>
 <div class="toast" id="toast"></div>
+<div id="sheetHost"></div>
 
 <script>
-const KEY = 'linkmemo.v1';
-const $ = s => document.querySelector(s);
+const COLORS=['c1','c2','c3','c4','c5','c6'];
+const LS='linkbook-v1';
+let state={cats:[],links:[]};
+let ui={cat:'__all',q:'',edit:false};
+let db=null, ref=null, saving=false, queued=false, saveTimer=null, localDirty=false;
 
-// ---------- データ ----------
-function load(){
-  try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d && Array.isArray(d.items)) return d; }catch(e){}
-  return {items:[], free:''};
-}
-let data = load();
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){ toast('保存できませんでした'); } }
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,10);
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function host(u){try{return new URL(u).host.replace(/^www\./,'')}catch{return u}}
+function normUrl(u){u=u.trim();if(!u)return u;if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u='https://'+u;return u}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1600)}
+function setStatus(m){$('#status').textContent=m||''}
 
-// ---------- 時間 ----------
-function parseTime(s){
-  s = String(s||'').trim().replace(/：/g,':');
-  if(!s) return null;
-  const a = s.split(':').map(Number);
-  if(a.some(n => isNaN(n) || n < 0)) return null;
-  return a.reduce((x,y) => x*60 + y, 0);
+/* ---------- storage ---------- */
+function loadLocal(){try{const s=JSON.parse(localStorage.getItem(LS)||'null');if(s&&Array.isArray(s.links))state=clean(s)}catch{}}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch{}}
+function clean(s){return{cats:Array.isArray(s.cats)?s.cats.filter(c=>c&&c.id):[],links:Array.isArray(s.links)?s.links.filter(l=>l&&l.id):[]}}
+function commit(){saveLocal();render();if(!ref)return;localDirty=true;clearTimeout(saveTimer);saveTimer=setTimeout(flush,500)}
+async function flush(){
+  if(saving){queued=true;return}
+  saving=true;setStatus('保存中…');
+  try{await ref.set({cats:state.cats,links:state.links,updatedAt:Date.now()});setStatus('')}
+  catch(e){setStatus('保存できませんでした。この端末には残っています（'+(e&&e.code||'error')+'）')}
+  saving=false;
+  if(queued){queued=false;flush()}else localDirty=false;
 }
-function fmtTime(sec){
-  sec = Math.floor(sec);
-  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
-  const p = n => String(n).padStart(2,'0');
-  return h ? `${h}:${p(m)}:${p(s)}` : `${m}:${p(s)}`;
-}
-function timeUrl(url, sec){ return url.split('#')[0] + '#t=' + sec; }
-
-// ---------- 描画 ----------
-function esc(s){ return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function render(){
-  const list = $('#list');
-  if(!data.items.length){
-    list.innerHTML = '<div class="empty">右上の「＋追加」からリンクを登録</div>';
-    return;
+function connect(){
+  let first=true;try{first=localStorage.getItem(LS)===null}catch{}
+  loadLocal();
+  if(first&&!state.links.length){
+    state={cats:[{id:'ex1',name:'例：よく使う'}],links:[
+      {id:'e1',title:'Googleカレンダー',url:'https://calendar.google.com/',memo:'例のリンクです。編集→タップで書き換え・削除できます',cat:'ex1',color:'c1'},
+      {id:'e2',title:'Gmail',url:'https://mail.google.com/',memo:'ボタンの下にはこんなふうにメモが出ます',cat:'ex1',color:'c4'},
+      {id:'e3',title:'Dropbox',url:'https://www.dropbox.com/home',memo:'',cat:'ex1',color:'c2'}]};
+    saveLocal();
   }
-  list.innerHTML = data.items.map((it,i) => `
-    <div class="card" data-i="${i}">
-      <a class="main" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title || it.url || '(無題)')}</a>
-      ${it.memo ? `<div class="memo">${esc(it.memo)}</div>` : ''}
-      ${it.times && it.times.length ? `<div class="times">${it.times.map(t =>
-        `<a class="chip" href="${esc(timeUrl(it.url, t.sec))}" target="_blank" rel="noopener">${fmtTime(t.sec)}${t.label ? `<small>${esc(t.label)}</small>` : ''}</a>`
-      ).join('')}</div>` : ''}
-      <div class="ops">
-        <button data-act="up" ${i===0?'disabled':''}>↑</button>
-        <button data-act="down" ${i===data.items.length-1?'disabled':''}>↓</button>
-        <button data-act="edit">編集</button>
-      </div>
-    </div>`).join('');
+  render();
 }
-$('#list').addEventListener('click', e => {
-  const b = e.target.closest('button[data-act]'); if(!b) return;
-  const i = +b.closest('.card').dataset.i, act = b.dataset.act;
-  if(act === 'edit') openEdit(i);
-  else{
-    const j = act === 'up' ? i-1 : i+1;
-    if(j < 0 || j >= data.items.length) return;
-    [data.items[i], data.items[j]] = [data.items[j], data.items[i]];
-    save(); render();
-  }
-});
-
-// ---------- 自由メモ ----------
-const free = $('#freeMemo');
-free.value = data.free || '';
-free.addEventListener('input', () => { data.free = free.value; save(); });
-
-// ---------- 編集ダイアログ ----------
-const dlg = $('#dlg');
-let editing = -1;
-function timeRow(t){
-  const d = document.createElement('div');
-  d.className = 'trow';
-  d.innerHTML = `<input class="t" placeholder="1:30" inputmode="numbers-and-punctuation" value="${t ? fmtTime(t.sec) : ''}">
-    <input class="l" placeholder="メモ（任意）" value="${esc(t ? t.label : '')}">
-    <button type="button" aria-label="削除">✕</button>`;
-  d.querySelector('button').onclick = () => d.remove();
-  return d;
-}
-function openEdit(i){
-  editing = i;
-  const it = i >= 0 ? data.items[i] : {title:'',url:'',memo:'',times:[]};
-  $('#fTitle').value = it.title; $('#fUrl').value = it.url; $('#fMemo').value = it.memo;
-  const ft = $('#fTimes'); ft.innerHTML = '';
-  (it.times||[]).forEach(t => ft.appendChild(timeRow(t)));
-  $('#delBtn').style.visibility = i >= 0 ? 'visible' : 'hidden';
-  dlg.showModal();
-}
-$('#addBtn').onclick = () => openEdit(-1);
-$('#addTime').onclick = () => { const r = timeRow(null); $('#fTimes').appendChild(r); r.querySelector('input').focus(); };
-$('#cancelBtn').onclick = () => dlg.close();
-$('#saveBtn').onclick = () => {
-  const url = $('#fUrl').value.trim();
-  if(!url){ toast('URLを入れてください'); return; }
-  const times = [];
-  let bad = false;
-  $('#fTimes').querySelectorAll('.trow').forEach(r => {
-    const raw = r.querySelector('.t').value;
-    if(!raw.trim()) return;
-    const sec = parseTime(raw);
-    if(sec == null){ bad = true; return; }
-    times.push({sec, label: r.querySelector('.l').value.trim()});
+/* ---------- render ---------- */
+function catName(id){return state.cats.find(c=>c.id===id)?.name||'未分類'}
+function filtered(){
+  const q=ui.q.trim().toLowerCase();
+  return state.links.filter(l=>{
+    if(ui.cat!=='__all'&&(l.cat||'')!==ui.cat)return false;
+    if(!q)return true;
+    return [l.title,l.memo,l.url,catName(l.cat)].join(' ').toLowerCase().includes(q);
   });
-  if(bad){ toast('時間の書き方が違います（例 1:30）'); return; }
-  times.sort((a,b) => a.sec - b.sec);
-  const it = {title: $('#fTitle').value.trim(), url, memo: $('#fMemo').value.trim(), times};
-  if(editing >= 0) data.items[editing] = it; else data.items.push(it);
-  save(); render(); dlg.close();
-};
-$('#delBtn').onclick = () => {
-  if(editing < 0) return;
-  if(!confirm('このボタンを削除しますか？')) return;
-  data.items.splice(editing,1); save(); render(); dlg.close();
-};
+}
+function render(){
+  $('#editToggle').classList.toggle('on',ui.edit);
+  $('#editToggle').setAttribute('aria-pressed',ui.edit);
+  $('#editToggle').textContent=ui.edit?'完了':'編集';
+  if(ui.cat!=='__all'&&ui.cat!==''&&!state.cats.some(c=>c.id===ui.cat))ui.cat='__all';
+  const count=id=>state.links.filter(l=>(l.cat||'')===id).length;
+  const hasUncat=state.links.some(l=>!l.cat||!state.cats.some(c=>c.id===l.cat));
+  let tabs=`<button class="tab" data-cat="__all" aria-pressed="${ui.cat==='__all'}">すべて<span class="n">${state.links.length}</span></button>`;
+  tabs+=state.cats.map(c=>`<button class="tab" data-cat="${c.id}" aria-pressed="${ui.cat===c.id}">${esc(c.name)}<span class="n">${count(c.id)}</span>${ui.edit?' ✎':''}</button>`).join('');
+  if(hasUncat)tabs+=`<button class="tab" data-cat="" aria-pressed="${ui.cat===''}">未分類<span class="n">${count('')}</span></button>`;
+  $('#tabs').innerHTML=tabs;
 
-// ---------- ブックマークレット ----------
-const BM = String.raw`javascript:(function(){function p(s){s=String(s).trim().replace(/：/g,':');if(!s)return null;var a=s.split(':').map(Number);for(var i=0;i<a.length;i++){if(isNaN(a[i]))return null}return a.reduce(function(x,y){return x*60+y},0)}var m=location.hash.match(/t=([\d:]+)/);var t=m?p(m[1]):null;if(t==null){t=p(prompt('何秒に飛ぶ？（例 1:30）')||'');if(t==null)return}var v=[].slice.call(document.querySelectorAll('video'));if(!v.length){alert('動画が見つかりません。先に再生ボタンを押してください');return}v.sort(function(a,b){return b.clientWidth*b.clientHeight-a.clientWidth*a.clientHeight});var x=v[0];function go(){x.currentTime=t;var r=x.play();if(r&&r.catch)r.catch(function(){})}if(x.readyState<1){x.addEventListener('loadedmetadata',go,{once:true});x.play()}else go()})();`;
-$('#bmCode').textContent = BM;
-
-async function copyText(s){
-  try{ await navigator.clipboard.writeText(s); return true; }
-  catch(e){
-    const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta);
-    ta.select(); let ok = false; try{ ok = document.execCommand('copy'); }catch(_){}
-    ta.remove(); return ok;
+  const items=filtered();
+  if(!state.links.length){
+    $('#list').innerHTML=`<div class="empty"><b>まだリンクがありません</b><span>右下の「＋ 追加」から、よく開くページを登録してください。</span></div>`;return;
   }
-}
-$('#copyBm').onclick = async () => toast(await copyText(BM) ? 'コピーしました' : 'コピーできませんでした');
+  if(!items.length){$('#list').innerHTML=`<div class="empty"><b>見つかりません</b><span>検索語やカテゴリを変えてみてください。</span></div>`;return}
 
-// ---------- バックアップ ----------
-$('#exportBtn').onclick = async () => {
-  const s = JSON.stringify(data);
-  $('#ioArea').value = s;
-  toast(await copyText(s) ? '書き出してコピーしました' : '下の欄からコピーしてください');
-};
-$('#importBtn').onclick = () => {
-  try{
-    const d = JSON.parse($('#ioArea').value);
-    if(!d || !Array.isArray(d.items)) throw 0;
-    if(!confirm('今のデータを上書きして読み込みますか？')) return;
-    data = {items: d.items, free: d.free || ''};
-    free.value = data.free; save(); render(); toast('読み込みました');
-  }catch(e){ toast('読み込めませんでした'); }
-};
-
-// ---------- トースト ----------
-let tt;
-function toast(msg){
-  const el = $('#toast'); el.textContent = msg; el.classList.add('on');
-  clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 1800);
+  const card=l=>{
+    const col=COLORS.includes(l.color)?l.color:'c1';
+    const ch=esc((l.title||host(l.url)||'?').trim().charAt(0).toUpperCase());
+    const inner=`<span class="dot" style="background:var(--${col})">${ch}</span><span class="t"><b>${esc(l.title||host(l.url))}</b><small>${esc(host(l.url))}</small></span>`;
+    const main=ui.edit
+      ?`<button class="btn" data-edit="${l.id}">${inner}<span class="side"><span class="mini" data-up="${l.id}" role="button" aria-label="上へ" style="display:grid;place-items:center">↑</span><span class="mini" data-down="${l.id}" role="button" aria-label="下へ" style="display:grid;place-items:center">↓</span></span></button>`
+      :`<div class="btn" style="padding:0;gap:0"><a href="${esc(l.url)}" target="_blank" rel="noopener" data-open="${l.id}" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:10px 4px 10px 10px;color:inherit;text-decoration:none">${inner}</a><span class="side" style="padding-right:10px"><button class="mini" data-copy="${l.id}" aria-label="URLをコピー">コピー</button></span></div>`;
+    return `<div class="item">${main}${l.memo?`<div class="memo">${esc(l.memo)}</div>`:''}</div>`;
+  };
+  if(ui.cat==='__all'&&!ui.q.trim()&&state.cats.length){
+    const groups=[...state.cats.map(c=>({id:c.id,name:c.name})),{id:'',name:'未分類'}];
+    $('#list').innerHTML=groups.map(g=>{
+      const ls=items.filter(l=>g.id?l.cat===g.id:(!l.cat||!state.cats.some(c=>c.id===l.cat)));
+      return ls.length?`<div class="group-h">${esc(g.name)}</div>${ls.map(card).join('')}`:'';
+    }).join('');
+  }else $('#list').innerHTML=items.map(card).join('');
 }
 
-render();
+/* ---------- events ---------- */
+$('#tabs').addEventListener('click',e=>{
+  const b=e.target.closest('.tab');if(!b)return;
+  const id=b.dataset.cat;
+  if(ui.edit&&id&&id!=='__all'&&ui.cat===id){openCatSheet(id);return}
+  ui.cat=id;render();
+});
+$('#q').addEventListener('input',e=>{ui.q=e.target.value;render()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){e.preventDefault();$('#q').focus()}
+  if(e.key==='Enter'&&document.activeElement===$('#q')){const f=filtered()[0];if(f){touch(f.id);window.open(f.url,'_blank','noopener')}}
+  if(e.key==='Escape')closeSheet();
+});
+$('#editToggle').addEventListener('click',()=>{ui.edit=!ui.edit;render()});
+$('#addBtn').addEventListener('click',()=>openLinkSheet(null));
+$('#moreBtn').addEventListener('click',openMoreSheet);
+$('#list').addEventListener('click',async e=>{
+  const up=e.target.closest('[data-up]'),down=e.target.closest('[data-down]');
+  if(up||down){e.stopPropagation();move((up||down).dataset.up||(up||down).dataset.down,up?-1:1);return}
+  const cp=e.target.closest('[data-copy]');
+  if(cp){const l=state.links.find(x=>x.id===cp.dataset.copy);copyText(l.url);return}
+  const ed=e.target.closest('[data-edit]');if(ed){openLinkSheet(ed.dataset.edit);return}
+  const op=e.target.closest('[data-open]');if(op)touch(op.dataset.open);
+});
+function touch(id){const l=state.links.find(x=>x.id===id);if(l){l.openedAt=Date.now();saveLocal()}}
+async function copyText(t){try{await navigator.clipboard.writeText(t);toast('URLをコピーしました')}catch{toast('コピーできませんでした')}}
+function move(id,dir){
+  // 表示中の並び（同じカテゴリ内）で入れ替え
+  const l=state.links.find(x=>x.id===id);
+  const peers=state.links.filter(x=>(x.cat||'')===(l.cat||''));
+  const i=peers.indexOf(l),j=i+dir;if(j<0||j>=peers.length)return;
+  const a=state.links.indexOf(l),b=state.links.indexOf(peers[j]);
+  [state.links[a],state.links[b]]=[state.links[b],state.links[a]];
+  commit();
+}
+
+/* ---------- sheets ---------- */
+function openSheet(html){
+  $('#sheetHost').innerHTML=`<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true"><div class="sheet-in">${html}</div></div>`;
+  $('#sheetHost').querySelector('[data-close]').onclick=closeSheet;
+  $('#sheetHost').querySelectorAll('[data-cancel]').forEach(b=>b.onclick=closeSheet);
+}
+function closeSheet(){$('#sheetHost').innerHTML=''}
+function openLinkSheet(id){
+  const l=id?state.links.find(x=>x.id===id):{title:'',url:'',memo:'',cat:(ui.cat!=='__all'?ui.cat:(state.cats[0]?.id||'')),color:'c1'};
+  const opts=`<option value="">未分類</option>`+state.cats.map(c=>`<option value="${c.id}"${c.id===l.cat?' selected':''}>${esc(c.name)}</option>`).join('')+`<option value="__new">＋ 新しいカテゴリ…</option>`;
+  openSheet(`
+    <h2>${id?'リンクを編集':'リンクを追加'}</h2>
+    <label>URL<input id="fUrl" type="url" inputmode="url" value="${esc(l.url)}" placeholder="https://…"></label>
+    <label>ボタンの名前<input id="fTitle" type="text" value="${esc(l.title)}" placeholder="例：経費精算"></label>
+    <label>ボタンの下のメモ<textarea id="fMemo" placeholder="例：毎月25日まで／ログインは社用アカウント">${esc(l.memo)}</textarea></label>
+    <label>カテゴリ<select id="fCat">${opts}</select></label>
+    <label id="newCatWrap" hidden>新しいカテゴリ名<input id="fNewCat" type="text" placeholder="例：案件A"></label>
+    <div><div class="note" style="margin-bottom:6px">色</div><div class="swatches" id="fColor">${COLORS.map(c=>`<button type="button" class="sw" data-c="${c}" aria-label="${c}" aria-pressed="${(l.color||'c1')===c}" style="background:var(--${c})"></button>`).join('')}</div></div>
+    <div class="row"><button class="ghost" data-cancel>やめる</button><button class="primary" id="fSave">保存</button></div>
+    ${id?`<button class="ghost danger" id="fDel">このリンクを削除</button>`:''}
+  `);
+  let color=l.color||'c1';
+  $('#fColor').onclick=e=>{const b=e.target.closest('.sw');if(!b)return;color=b.dataset.c;$('#fColor').querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed',x===b))};
+  $('#fCat').onchange=e=>{$('#newCatWrap').hidden=e.target.value!=='__new';if(e.target.value==='__new')$('#fNewCat').focus()};
+  $('#fSave').onclick=()=>{
+    const url=normUrl($('#fUrl').value);
+    if(!url){$('#fUrl').focus();toast('URLを入れてください');return}
+    let cat=$('#fCat').value;
+    if(cat==='__new'){const n=$('#fNewCat').value.trim();if(!n){$('#fNewCat').focus();toast('カテゴリ名を入れてください');return}cat=uid();state.cats.push({id:cat,name:n})}
+    const data={title:$('#fTitle').value.trim(),url,memo:$('#fMemo').value.trim(),cat,color};
+    if(id)Object.assign(l,data);else state.links.push({id:uid(),...data,createdAt:Date.now()});
+    closeSheet();commit();toast(id?'保存しました':'追加しました');
+  };
+  if(id){const d=$('#fDel');d.onclick=()=>{if(!d.classList.contains('armed')){d.classList.add('armed');d.textContent='もう一度押すと削除';return}
+    state.links=state.links.filter(x=>x.id!==id);closeSheet();commit();toast('削除しました')}}
+  if(!id)setTimeout(()=>$('#fUrl').focus(),50);
+}
+function openCatSheet(cid){
+  const c=state.cats.find(x=>x.id===cid);if(!c)return;
+  const i=state.cats.indexOf(c);
+  openSheet(`
+    <h2>カテゴリを編集</h2>
+    <label>名前<input id="cName" type="text" value="${esc(c.name)}"></label>
+    <div class="row"><button class="ghost" id="cLeft" ${i===0?'disabled':''}>← 前へ</button><button class="ghost" id="cRight" ${i===state.cats.length-1?'disabled':''}>後へ →</button></div>
+    <div class="row"><button class="ghost" data-cancel>やめる</button><button class="primary" id="cSave">保存</button></div>
+    <button class="ghost danger" id="cDel">カテゴリを削除（中のリンクは未分類へ）</button>
+  `);
+  const mv=d=>{const j=i+d;[state.cats[i],state.cats[j]]=[state.cats[j],state.cats[i]];closeSheet();commit()};
+  $('#cLeft').onclick=()=>mv(-1);$('#cRight').onclick=()=>mv(1);
+  $('#cSave').onclick=()=>{const n=$('#cName').value.trim();if(n)c.name=n;closeSheet();commit()};
+  const d=$('#cDel');d.onclick=()=>{if(!d.classList.contains('armed')){d.classList.add('armed');d.textContent='もう一度押すと削除';return}
+    state.cats=state.cats.filter(x=>x.id!==cid);state.links.forEach(l=>{if(l.cat===cid)l.cat=''});ui.cat='__all';closeSheet();commit()};
+}
+function openMoreSheet(){
+  openSheet(`
+    <h2>バックアップ</h2>
+    <p class="note">データはこの端末のこのブラウザだけに保存されます。ブラウザのデータ消去で消えるので、ときどき書き出しておくと安心です。別の端末へ移すときも、書き出し→読み込みで移せます。</p>
+    <button class="ghost" id="bCopy">データをコピー（テキスト）</button>
+    <button class="ghost" id="bSave">ファイルに書き出す</button>
+    <label>ファイルから読み込む<input id="bFile" type="file" accept=".json,application/json,text/plain"></label>
+    <label>またはテキストを貼り付け<textarea id="bIn" placeholder='{"cats":[…],"links":[…]}'></textarea></label>
+    <button class="ghost danger" id="bLoad">貼り付けた内容で置き換える</button>
+    <button class="ghost" data-cancel>閉じる</button>
+  `);
+  const json=()=>JSON.stringify({cats:state.cats,links:state.links},null,1);
+  $('#bCopy').onclick=async()=>{try{await navigator.clipboard.writeText(json());toast('コピーしました')}catch{$('#bIn').value=json();$('#bIn').select();toast('下の欄を選択してコピーしてください')}};
+  $('#bSave').onclick=()=>{
+    try{const blob=new Blob([json()],{type:'application/json'});const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);a.download='linkbook-'+new Date().toISOString().slice(0,10)+'.json';
+      document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('書き出しました')}
+    catch{toast('書き出せませんでした。コピーを使ってください')}
+  };
+  $('#bFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{$('#bIn').value=r.result;toast('読み込みました。下のボタンで置き換えます')};r.readAsText(f)};
+  const b=$('#bLoad');b.onclick=()=>{
+    let s;try{s=clean(JSON.parse($('#bIn').value))}catch{toast('読み込めない形式です');return}
+    if(!b.classList.contains('armed')){b.classList.add('armed');b.textContent=`もう一度押すと ${s.links.length} 件で置き換え`;return}
+    state=s;ui.cat='__all';closeSheet();commit();toast('読み込みました');
+  };
+}
+
+connect();
 </script>
+
 </body>
 </html>
