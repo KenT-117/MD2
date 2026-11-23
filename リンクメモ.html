@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>リンクメモ</title>
+<style>
+:root{
+  --bg:#f4f4f6;--card:#fff;--text:#1b1b1f;--sub:#6b6b75;--line:#e2e2e8;
+  --accent:#ff5a5f;--accent-text:#fff;--chip:#ffecec;--chip-text:#c2363b;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121214;--card:#1e1e22;--text:#f2f2f5;--sub:#9a9aa5;--line:#2e2e34;
+    --chip:#3a2224;--chip-text:#ff9a9d;}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;
+  padding:0 16px calc(40px + env(safe-area-inset-bottom));}
+header{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;
+  justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 0 10px;}
+h1{font-size:20px;margin:0}
+button{font:inherit;border:none;border-radius:10px;cursor:pointer}
+.primary{background:var(--accent);color:var(--accent-text);padding:9px 16px;font-weight:700}
+.ghost{background:transparent;color:var(--sub);padding:6px 10px;border:1px solid var(--line)}
+textarea,input{font:inherit;font-size:16px;color:var(--text);background:var(--card);
+  border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+#freeMemo{min-height:64px;resize:vertical}
+.free-label{font-size:12px;color:var(--sub);margin:4px 0 4px 2px}
+#list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.empty{color:var(--sub);text-align:center;padding:40px 0;font-size:14px}
+.card{background:var(--card);border-radius:14px;padding:12px;border:1px solid var(--line)}
+.main{display:block;background:var(--accent);color:var(--accent-text);text-decoration:none;
+  font-weight:700;font-size:17px;padding:14px;border-radius:10px;text-align:center;word-break:break-all}
+.memo{font-size:14px;color:var(--sub);margin-top:8px;white-space:pre-wrap;word-break:break-word}
+.times{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:var(--chip);color:var(--chip-text);text-decoration:none;border-radius:999px;
+  padding:7px 12px;font-size:14px;font-weight:700}
+.chip small{font-weight:400;margin-left:4px}
+.ops{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
+.ops button{background:transparent;color:var(--sub);padding:4px 10px;font-size:13px;border:1px solid var(--line)}
+details{margin-top:28px;background:var(--card);border-radius:14px;border:1px solid var(--line);padding:12px}
+summary{font-weight:700;cursor:pointer}
+details h3{font-size:15px;margin:16px 0 6px}
+details ol{padding-left:20px;font-size:14px;line-height:1.7;margin:0}
+details p{font-size:14px;line-height:1.6;margin:6px 0}
+code.bm{display:block;font-size:11px;word-break:break-all;background:var(--bg);padding:8px;border-radius:8px;
+  max-height:80px;overflow:auto;margin:6px 0}
+.row{display:flex;gap:8px;margin-top:8px}
+dialog{border:none;border-radius:16px;padding:0;width:min(520px,calc(100vw - 24px));
+  background:var(--card);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg{padding:16px;display:flex;flex-direction:column;gap:10px;max-height:85vh;overflow:auto}
+.dlg label{font-size:12px;color:var(--sub);margin-bottom:-6px}
+.trow{display:flex;gap:6px;align-items:center}
+.trow input.t{width:90px;flex:none}
+.trow button{flex:none;background:transparent;color:var(--sub);font-size:18px;padding:4px 8px}
+.dlg-foot{display:flex;gap:8px;justify-content:space-between;margin-top:6px}
+.danger{background:transparent;color:#e5484d;padding:9px 10px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:#333;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;
+  transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>リンクメモ</h1>
+  <button class="primary" id="addBtn">＋追加</button>
+</header>
+
+<div class="free-label">メモ</div>
+<textarea id="freeMemo" placeholder="自由にメモ（自動保存）"></textarea>
+
+<main id="list"></main>
+
+<details id="settings">
+  <summary>⚙ 時間ジャンプの設定・バックアップ</summary>
+
+  <h3>① 時間ジャンプを登録（最初に1回だけ）</h3>
+  <ol>
+    <li>下の「コードをコピー」を押す</li>
+    <li>Safari下の共有ボタン →「ブックマークを追加」→ 名前を <b>ジャンプ</b> にして保存</li>
+    <li>ブックマーク一覧（本のアイコン）→ 右下「編集」→「ジャンプ」をタップ</li>
+    <li>アドレス欄を全部消して、コピーしたコードを貼り付け → 完了</li>
+  </ol>
+  <code class="bm" id="bmCode"></code>
+  <button class="primary" id="copyBm">コードをコピー</button>
+
+  <h3>② 使い方</h3>
+  <ol>
+    <li>このページで時間ボタン（例: 1:30）をタップ</li>
+    <li>開いたページで動画の再生ボタンを押す</li>
+    <li>アドレス欄をタップして「<b>ジャンプ</b>」と入力 → 候補に出たブックマークをタップ</li>
+  </ol>
+  <p>→ その時間に飛びます。時間ボタン以外から開いたときは、何秒に飛ぶか聞かれます。</p>
+
+  <h3>バックアップ</h3>
+  <p>データはこのiPhoneのSafariにだけ保存されています。たまに書き出してメモアプリ等に保存しておくと安心です。</p>
+  <div class="row">
+    <button class="ghost" id="exportBtn">書き出し（コピー）</button>
+    <button class="ghost" id="importBtn">読み込み</button>
+  </div>
+  <textarea id="ioArea" rows="4" placeholder="読み込むときはここに貼り付けてから「読み込み」" style="margin-top:8px"></textarea>
+</details>
+
+<dialog id="dlg">
+  <form class="dlg" method="dialog" id="form">
+    <label>ボタン名</label>
+    <input id="fTitle" placeholder="例：お気に入り①">
+    <label>リンク（URL）</label>
+    <input id="fUrl" type="url" inputmode="url" placeholder="https://...">
+    <label>ボタンのメモ</label>
+    <textarea id="fMemo" rows="3" placeholder="メモ（任意）"></textarea>
+    <label>時間ボタン（例: 1:30 / 90 / 1:02:03）</label>
+    <div id="fTimes"></div>
+    <button type="button" class="ghost" id="addTime">＋時間を追加</button>
+    <div class="dlg-foot">
+      <button type="button" class="danger" id="delBtn">削除</button>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="ghost" id="cancelBtn">キャンセル</button>
+        <button type="button" class="primary" id="saveBtn">保存</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'linkmemo.v1';
+const $ = s => document.querySelector(s);
+
+// ---------- データ ----------
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d && Array.isArray(d.items)) return d; }catch(e){}
+  return {items:[], free:''};
+}
+let data = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){ toast('保存できませんでした'); } }
+
+// ---------- 時間 ----------
+function parseTime(s){
+  s = String(s||'').trim().replace(/：/g,':');
+  if(!s) return null;
+  const a = s.split(':').map(Number);
+  if(a.some(n => isNaN(n) || n < 0)) return null;
+  return a.reduce((x,y) => x*60 + y, 0);
+}
+function fmtTime(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  const p = n => String(n).padStart(2,'0');
+  return h ? `${h}:${p(m)}:${p(s)}` : `${m}:${p(s)}`;
+}
+function timeUrl(url, sec){ return url.split('#')[0] + '#t=' + sec; }
+
+// ---------- 描画 ----------
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function render(){
+  const list = $('#list');
+  if(!data.items.length){
+    list.innerHTML = '<div class="empty">右上の「＋追加」からリンクを登録</div>';
+    return;
+  }
+  list.innerHTML = data.items.map((it,i) => `
+    <div class="card" data-i="${i}">
+      <a class="main" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.title || it.url || '(無題)')}</a>
+      ${it.memo ? `<div class="memo">${esc(it.memo)}</div>` : ''}
+      ${it.times && it.times.length ? `<div class="times">${it.times.map(t =>
+        `<a class="chip" href="${esc(timeUrl(it.url, t.sec))}" target="_blank" rel="noopener">${fmtTime(t.sec)}${t.label ? `<small>${esc(t.label)}</small>` : ''}</a>`
+      ).join('')}</div>` : ''}
+      <div class="ops">
+        <button data-act="up" ${i===0?'disabled':''}>↑</button>
+        <button data-act="down" ${i===data.items.length-1?'disabled':''}>↓</button>
+        <button data-act="edit">編集</button>
+      </div>
+    </div>`).join('');
+}
+$('#list').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]'); if(!b) return;
+  const i = +b.closest('.card').dataset.i, act = b.dataset.act;
+  if(act === 'edit') openEdit(i);
+  else{
+    const j = act === 'up' ? i-1 : i+1;
+    if(j < 0 || j >= data.items.length) return;
+    [data.items[i], data.items[j]] = [data.items[j], data.items[i]];
+    save(); render();
+  }
+});
+
+// ---------- 自由メモ ----------
+const free = $('#freeMemo');
+free.value = data.free || '';
+free.addEventListener('input', () => { data.free = free.value; save(); });
+
+// ---------- 編集ダイアログ ----------
+const dlg = $('#dlg');
+let editing = -1;
+function timeRow(t){
+  const d = document.createElement('div');
+  d.className = 'trow';
+  d.innerHTML = `<input class="t" placeholder="1:30" inputmode="numbers-and-punctuation" value="${t ? fmtTime(t.sec) : ''}">
+    <input class="l" placeholder="メモ（任意）" value="${esc(t ? t.label : '')}">
+    <button type="button" aria-label="削除">✕</button>`;
+  d.querySelector('button').onclick = () => d.remove();
+  return d;
+}
+function openEdit(i){
+  editing = i;
+  const it = i >= 0 ? data.items[i] : {title:'',url:'',memo:'',times:[]};
+  $('#fTitle').value = it.title; $('#fUrl').value = it.url; $('#fMemo').value = it.memo;
+  const ft = $('#fTimes'); ft.innerHTML = '';
+  (it.times||[]).forEach(t => ft.appendChild(timeRow(t)));
+  $('#delBtn').style.visibility = i >= 0 ? 'visible' : 'hidden';
+  dlg.showModal();
+}
+$('#addBtn').onclick = () => openEdit(-1);
+$('#addTime').onclick = () => { const r = timeRow(null); $('#fTimes').appendChild(r); r.querySelector('input').focus(); };
+$('#cancelBtn').onclick = () => dlg.close();
+$('#saveBtn').onclick = () => {
+  const url = $('#fUrl').value.trim();
+  if(!url){ toast('URLを入れてください'); return; }
+  const times = [];
+  let bad = false;
+  $('#fTimes').querySelectorAll('.trow').forEach(r => {
+    const raw = r.querySelector('.t').value;
+    if(!raw.trim()) return;
+    const sec = parseTime(raw);
+    if(sec == null){ bad = true; return; }
+    times.push({sec, label: r.querySelector('.l').value.trim()});
+  });
+  if(bad){ toast('時間の書き方が違います（例 1:30）'); return; }
+  times.sort((a,b) => a.sec - b.sec);
+  const it = {title: $('#fTitle').value.trim(), url, memo: $('#fMemo').value.trim(), times};
+  if(editing >= 0) data.items[editing] = it; else data.items.push(it);
+  save(); render(); dlg.close();
+};
+$('#delBtn').onclick = () => {
+  if(editing < 0) return;
+  if(!confirm('このボタンを削除しますか？')) return;
+  data.items.splice(editing,1); save(); render(); dlg.close();
+};
+
+// ---------- ブックマークレット ----------
+const BM = String.raw`javascript:(function(){function p(s){s=String(s).trim().replace(/：/g,':');if(!s)return null;var a=s.split(':').map(Number);for(var i=0;i<a.length;i++){if(isNaN(a[i]))return null}return a.reduce(function(x,y){return x*60+y},0)}var m=location.hash.match(/t=([\d:]+)/);var t=m?p(m[1]):null;if(t==null){t=p(prompt('何秒に飛ぶ？（例 1:30）')||'');if(t==null)return}var v=[].slice.call(document.querySelectorAll('video'));if(!v.length){alert('動画が見つかりません。先に再生ボタンを押してください');return}v.sort(function(a,b){return b.clientWidth*b.clientHeight-a.clientWidth*a.clientHeight});var x=v[0];function go(){x.currentTime=t;var r=x.play();if(r&&r.catch)r.catch(function(){})}if(x.readyState<1){x.addEventListener('loadedmetadata',go,{once:true});x.play()}else go()})();`;
+$('#bmCode').textContent = BM;
+
+async function copyText(s){
+  try{ await navigator.clipboard.writeText(s); return true; }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = s; document.body.appendChild(ta);
+    ta.select(); let ok = false; try{ ok = document.execCommand('copy'); }catch(_){}
+    ta.remove(); return ok;
+  }
+}
+$('#copyBm').onclick = async () => toast(await copyText(BM) ? 'コピーしました' : 'コピーできませんでした');
+
+// ---------- バックアップ ----------
+$('#exportBtn').onclick = async () => {
+  const s = JSON.stringify(data);
+  $('#ioArea').value = s;
+  toast(await copyText(s) ? '書き出してコピーしました' : '下の欄からコピーしてください');
+};
+$('#importBtn').onclick = () => {
+  try{
+    const d = JSON.parse($('#ioArea').value);
+    if(!d || !Array.isArray(d.items)) throw 0;
+    if(!confirm('今のデータを上書きして読み込みますか？')) return;
+    data = {items: d.items, free: d.free || ''};
+    free.value = data.free; save(); render(); toast('読み込みました');
+  }catch(e){ toast('読み込めませんでした'); }
+};
+
+// ---------- トースト ----------
+let tt;
+function toast(msg){
+  const el = $('#toast'); el.textContent = msg; el.classList.add('on');
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 1800);
+}
+
+render();
+</script>
+</body>
+</html>
